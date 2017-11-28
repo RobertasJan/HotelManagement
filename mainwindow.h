@@ -19,11 +19,12 @@ public slots:
 private:
     const int COLUMN_COUNT=4;
     QTableWidget *roomTable;
-    std::vector<Room> *roomList;
+    std::vector<Room*> roomList;
     QSqlDatabase db;
 
     void configureDatabase();
     void fillRoomClass();
+    void fillQTableWidget();
 };
 
 #endif // MAINWINDOW_H
