@@ -6,6 +6,8 @@
 #include <QSqlDatabase>
 #include <vector>
 #include "room.h"
+#include "client.h"
+#include "registerroombutton.h"
 
 class MainWindow : public QMainWindow
 {
@@ -19,6 +21,7 @@ public slots:
 private:
     const int COLUMN_COUNT=6;
     QTableWidget *roomTable;
+    RegisterRoomButton *registerButton;
     std::vector<Room*> roomList;
     QSqlDatabase db;
 
