@@ -27,10 +27,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
     room.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    person.cpp \
+    client.cpp \
+    registerroombutton.cpp
 
 HEADERS += \
     room.h \
-    mainwindow.h
+    mainwindow.h \
+    person.h \
+    client.h \
+    registerroombutton.h
 
 FORMS +=
