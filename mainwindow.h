@@ -17,7 +17,7 @@ signals:
 
 public slots:
 private:
-    const int COLUMN_COUNT=4;
+    const int COLUMN_COUNT=6;
     QTableWidget *roomTable;
     std::vector<Room*> roomList;
     QSqlDatabase db;
