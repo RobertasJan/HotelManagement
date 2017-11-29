@@ -11,7 +11,7 @@
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     // setting size of mainWindow to x=800, y=600
-    setFixedSize(1200,600);
+    setFixedSize(1250,600);
 
     // creating main room table (rows=0, columns=6, parent)
     roomTable = new QTableWidget(0,COLUMN_COUNT,this);
@@ -31,9 +31,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     roomTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     roomTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    // creating RegisterRoomButton for registering clients
-    registerButton = new RegisterRoomButton("Registruoti klientą", this);
-    registerButton->move(700,20);
+    // creating RegisterButton for registering clients
+    registerButton = new QPushButton("Registruoti klientą", this);
+    registerButton-> setFixedSize(100,30);
+    registerButton->move(690,20);
+    connect(registerButton, SIGNAL(released()), this, SLOT(callRegisterWindow()));
+
+    unregisterButton = new QPushButton("Išregistruoti klientą", this);
+    unregisterButton->setFixedSize(100,30);
+    unregisterButton->move(690,60);
+
+    //creating groupBox for future use
+    groupBox = new GroupBox(this);
+    groupBox->hide();
 
     configureDatabase();
 
@@ -43,6 +53,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     registerButton->show();
     roomTable->show();
+}
+
+void MainWindow::callRegisterWindow()
+{
+    /* deleting groupbox to prevent memory leak
+     * it also delets children widgets, releasing memory*/
+    delete groupBox;
+    GroupBox *groupBox = new GroupBox(this);
+    groupBox->setTitle("Kliento registracija");
+    groupBox->move(800,20);
+    groupBox->show();
+    // making registerClient children of groupBox, for memory control
+    registerClient = new RegisterClient(groupBox);
+    registerClient->move(10,20);
+    registerClient->show();
 }
 
 // Configuring database parameters for future query executions
