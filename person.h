@@ -6,6 +6,7 @@
 class Person
 {
 public:
+    Person(int, QString, QString);
     virtual void setId(int);
     virtual void setFirstName(QString);
     virtual void setLastName(QString);

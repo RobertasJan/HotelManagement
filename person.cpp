@@ -1,6 +1,13 @@
 #include "person.h"
 
 
+Person::Person(int id, QString firstName, QString lastName)
+{
+    this->id = id;
+    this->firstName = firstName;
+    this->lastName = lastName;
+}
+
 void Person::setId(int id)
 {
     this->id = id;

@@ -30,13 +30,17 @@ SOURCES += \
     mainwindow.cpp \
     person.cpp \
     client.cpp \
-    registerroombutton.cpp
+    registerclient.cpp \
+    groupbox.cpp
 
 HEADERS += \
     room.h \
     mainwindow.h \
     person.h \
     client.h \
-    registerroombutton.h
+    registerclient.h \
+    groupbox.h
 
-FORMS +=
+FORMS += \
+    registerclient.ui \
+    groupbox.ui
