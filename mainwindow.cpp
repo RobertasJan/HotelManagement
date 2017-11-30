@@ -65,7 +65,7 @@ void MainWindow::callRegisterWindow()
     groupBox->move(800,20);
     groupBox->show();
     // making registerClient children of groupBox, for memory control
-    registerClient = new RegisterClient(groupBox);
+    registerClient = new RegisterClient(roomList, groupBox);
     registerClient->move(10,20);
     registerClient->show();
 }
@@ -86,7 +86,7 @@ void MainWindow::configureDatabase()
  * Only one Database connection is made, therefore query uses it as default */
 void MainWindow::fillRoomClass()
 {
-    QSqlQuery query;
+    QSqlQuery query, queryClient;
     query.exec("SELECT * FROM room");
     while (query.next()) {
         int roomNumber = query.value(0).toInt();
@@ -94,7 +94,15 @@ void MainWindow::fillRoomClass()
         bool isClean = query.value(2).toBool();
         QDate checkIn = query.value(3).toDate();
         QDate checkOut = query.value(4).toDate();
-        int clientId = query.value(5).toInt();
+        // retrieving id of client who occupies this room
+        queryClient.prepare("SELECT id FROM client WHERE roomid = :roomNumber");
+        queryClient.bindValue(":roomNumber", roomNumber);
+        queryClient.exec();
+        int clientId;
+        if (queryClient.next())
+            clientId = queryClient.value(0).toInt();
+        else
+            clientId = 0;
         roomList.push_back(new Room(roomNumber, roomType, isClean, checkIn, checkOut, clientId));
     }
 }

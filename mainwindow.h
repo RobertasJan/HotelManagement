@@ -6,10 +6,10 @@
 #include <QSqlDatabase>
 #include <QPushButton>
 #include <vector>
-#include "room.h"
-#include "client.h"
-#include "registerclient.h"
-#include <groupbox.h>
+#include "room.h" // room info
+#include "client.h" // client info
+#include "registerclient.h" // Register Client widget for room registration
+#include <groupbox.h> // Parent for one window mechanism
 
 
 class MainWindow : public QMainWindow

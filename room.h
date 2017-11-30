@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QDate>
+#include "reservations.h"
 
 class Room
 {
@@ -25,6 +26,7 @@ private:
     QDate checkIn;
     QDate checkOut;
     int clientId;
+    Reservations *reservations;
 };
 
 #endif // ROOM_H
