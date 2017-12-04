@@ -10,8 +10,8 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    // setting size of mainWindow to x=800, y=600
-    setFixedSize(1250,600);
+    // setting size of mainWindow to x=1320, y=600
+    setFixedSize(1320,600);
 
     // creating main room table (rows=0, columns=6, parent)
     roomTable = new QTableWidget(0,COLUMN_COUNT,this);
@@ -20,26 +20,33 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     roomTable->setFixedSize(650,550);
     roomTable->move(30,20);
 
-    /* setting header labels
-     * roomNumber, roomType, isClean, checkIn, checkOut, clientId */
-    QStringList headerLabels;
-    headerLabels << "Kambario numeris" << "Kambario tipas" << "Tvarkingas"
-                 << "Užsiregistravimas" << "Išsiregistravimas" << "Kliento ID";
-    roomTable->setHorizontalHeaderLabels(headerLabels);
-
     // stretching columns to be width of widget
     roomTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     roomTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // setting so items in table can be selected only one row
+    roomTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    roomTable->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    // creating RegisterButton for registering clients
+    // RegisterButton for registering clients
     registerButton = new QPushButton("Registruoti klientą", this);
-    registerButton-> setFixedSize(100,30);
-    registerButton->move(690,20);
+    registerButton-> setFixedSize(100, 30);
+    registerButton->move(690, 20);
     connect(registerButton, SIGNAL(released()), this, SLOT(callRegisterWindow()));
 
     unregisterButton = new QPushButton("Išregistruoti klientą", this);
-    unregisterButton->setFixedSize(100,30);
-    unregisterButton->move(690,60);
+    unregisterButton->setFixedSize(100, 30);
+    unregisterButton->move(690, 55);
+    connect(unregisterButton, SIGNAL(released()), this, SLOT(unregisterClient()));
+
+    clientInfoButton = new QPushButton("Klientų informacija", this);
+    clientInfoButton->setFixedSize(100, 30);
+    clientInfoButton->move(690, 110);
+    connect(clientInfoButton, SIGNAL(released()), this, SLOT(callClientWindow()));
+
+    refreshButton = new QPushButton("Atnaujinti", this);
+    refreshButton->setFixedSize(100, 30);
+    refreshButton->move(690, 550);
+    connect(refreshButton, SIGNAL(released()), this, SLOT(connectRefreshTable()));
 
     //creating groupBox for future use
     groupBox = new GroupBox(this);
@@ -47,9 +54,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     configureDatabase();
 
-    // filling roomList vector && roomTable table
-    fillRoomClass();
-    fillQTableWidget();
+    // filling roomList vector, clientList vector && roomTable table
+
+    connectRefreshTable();
 
     registerButton->show();
     roomTable->show();
@@ -65,9 +72,44 @@ void MainWindow::callRegisterWindow()
     groupBox->move(800,20);
     groupBox->show();
     // making registerClient children of groupBox, for memory control
-    registerClient = new RegisterClient(roomList, groupBox);
+    registerClient = new RegisterClient(&roomList, this, groupBox);
     registerClient->move(10,20);
     registerClient->show();
+}
+
+void MainWindow::callClientWindow()
+{
+    delete groupBox;
+    GroupBox *groupBox = new GroupBox(this);
+    groupBox->setTitle("Klientų informacija");
+    groupBox->move(800,20);
+    groupBox->show();
+
+    clientInfo = new ClientInfo(clientList, groupBox);
+    clientInfo->move(10,20);
+    clientInfo->show();
+
+}
+
+// TO BE DONE
+void MainWindow::unregisterClient()
+{
+    if (roomTable->selectionModel()->hasSelection())
+        qDebug () << roomTable->selectionModel()->selectedRows().first().row();
+    else
+        qDebug () << "None selected";
+}
+
+/* Function for clearing vectors of client and room
+ * refreshing main table contents */
+
+void MainWindow::connectRefreshTable()
+{
+    roomList.clear();
+    fillRoomClass();
+    clientList.clear();
+    fillClientClass();
+    fillQTableWidget();
 }
 
 // Configuring database parameters for future query executions
@@ -107,10 +149,34 @@ void MainWindow::fillRoomClass()
     }
 }
 
+void MainWindow::fillClientClass()
+{
+    QSqlQuery query;
+    query.exec("SELECT * FROM client");
+    while (query.next()) {
+        int id = query.value(0).toInt();
+        QString firstName = query.value(1).toString();
+        QString lastName = query.value(2).toString();
+        int passport = query.value(3).toInt();
+        QString info = query.value(4).toString();
+        bool disturb = query.value(5).toBool();
+        int roomId = query.value(6).toInt();
+        clientList.push_back(new Client(id, firstName, lastName, passport, info, disturb, roomId));
+    }
+
+}
+
 void MainWindow::fillQTableWidget()
 {
     // setting Row count to be size of vector roomList
     roomTable->setRowCount(roomList.size());
+
+    /* setting header labels
+     * roomNumber, roomType, isClean, checkIn, checkOut, clientId */
+    QStringList headerLabels;
+    headerLabels << "Kambario numeris" << "Kambario tipas" << "Tvarkingas"
+                 << "Užsiregistravimas" << "Išsiregistravimas" << "Kliento ID";
+    roomTable->setHorizontalHeaderLabels(headerLabels);
 
     /* Filling table from vector roomList;
      * index - table row;
