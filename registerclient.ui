@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>504</width>
     <height>529</height>
    </rect>
   </property>
@@ -123,9 +123,9 @@
   <widget class="QPlainTextEdit" name="extraInfo">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>30</y>
-     <width>191</width>
+     <width>201</width>
      <height>111</height>
     </rect>
    </property>
@@ -133,7 +133,7 @@
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>10</y>
      <width>111</width>
      <height>16</height>
@@ -146,7 +146,7 @@
   <widget class="QCheckBox" name="disturbCheckBox">
    <property name="geometry">
     <rect>
-     <x>90</x>
+     <x>100</x>
      <y>230</y>
      <width>81</width>
      <height>21</height>
@@ -174,7 +174,7 @@
     <rect>
      <x>10</x>
      <y>230</y>
-     <width>71</width>
+     <width>81</width>
      <height>22</height>
     </rect>
    </property>
@@ -182,20 +182,20 @@
   <widget class="QPushButton" name="saveButton">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>250</y>
      <width>75</width>
      <height>23</height>
     </rect>
    </property>
    <property name="text">
-    <string>Užsaugoti</string>
+    <string>Išsaugoti</string>
    </property>
   </widget>
   <widget class="QPushButton" name="clearButton">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>360</x>
      <y>250</y>
      <width>75</width>
      <height>23</height>
@@ -210,7 +210,7 @@
     <rect>
      <x>10</x>
      <y>280</y>
-     <width>371</width>
+     <width>471</width>
      <height>241</height>
     </rect>
    </property>
@@ -221,7 +221,7 @@
     <bool>false</bool>
    </attribute>
    <attribute name="horizontalHeaderDefaultSectionSize">
-    <number>117</number>
+    <number>144</number>
    </attribute>
    <attribute name="horizontalHeaderMinimumSectionSize">
     <number>50</number>
@@ -266,20 +266,20 @@
     <string>Laisvi kambariai:</string>
    </property>
   </widget>
-  <widget class="QDateEdit" name="dateEdit">
+  <widget class="QDateEdit" name="dateBeginCalendar">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>170</y>
      <width>110</width>
      <height>22</height>
     </rect>
    </property>
   </widget>
-  <widget class="QDateEdit" name="dateEdit_2">
+  <widget class="QDateEdit" name="dateEndCalendar">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>220</y>
      <width>110</width>
      <height>22</height>
@@ -289,7 +289,7 @@
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>150</y>
      <width>111</width>
      <height>16</height>
@@ -302,7 +302,7 @@
   <widget class="QLabel" name="label_9">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>280</x>
      <y>200</y>
      <width>111</width>
      <height>16</height>
@@ -310,6 +310,58 @@
    </property>
    <property name="text">
     <string>Išsiregistravimo data:</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="warningId">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>30</y>
+     <width>51</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="textFormat">
+    <enum>Qt::RichText</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="warningDate">
+   <property name="geometry">
+    <rect>
+     <x>400</x>
+     <y>170</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="warningInfo">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>10</y>
+     <width>111</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>

@@ -32,7 +32,8 @@ SOURCES += \
     client.cpp \
     registerclient.cpp \
     groupbox.cpp \
-    reservations.cpp
+    reservations.cpp \
+    clientinfo.cpp
 
 HEADERS += \
     room.h \
@@ -41,8 +42,10 @@ HEADERS += \
     client.h \
     registerclient.h \
     groupbox.h \
-    reservations.h
+    reservations.h \
+    clientinfo.h
 
 FORMS += \
     registerclient.ui \
-    groupbox.ui
+    groupbox.ui \
+    clientinfo.ui
