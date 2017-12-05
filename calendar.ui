@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Calendar</class>
+ <widget class="QWidget" name="Calendar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>502</width>
+    <height>505</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QComboBox" name="roomComboBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>111</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="calendarTable">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>471</width>
+     <height>431</height>
+    </rect>
+   </property>
+   <attribute name="horizontalHeaderDefaultSectionSize">
+    <number>90</number>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>Kliento ID</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Kliento Vardas</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Kliento Pavardė</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Rez pradžia</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>Rez pabaiga</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>91</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Kambario numeris:</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="unregisterButton">
+   <property name="geometry">
+    <rect>
+     <x>374</x>
+     <y>20</y>
+     <width>100</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Išregistruoti klientą</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -5,23 +5,26 @@
 #include <QMessageBox>
 #include <QDebug>
 
-RegisterClient::RegisterClient(std::vector<Room*> *roomList, MainWindow *mainWindow, QWidget *parent) :
+RegisterClient::RegisterClient(std::vector<Room*> *roomList, std::vector<Client*> *clientList, MainWindow *mainWindow, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::RegisterClient)
 {
     ui->setupUi(this);
 
     this->roomList = roomList;
+    this->clientList = clientList;
     this->mainWindow = mainWindow;
-
-    /* filling table widget and combobox with room information
-     * fills with rooms which has no clients */
-
-    fillRoomList();
 
     QDate currentDate;
     ui->dateBeginCalendar->setDate(currentDate.currentDate());
     ui->dateEndCalendar->setDate(currentDate.currentDate().addDays(1));
+
+    /* filling table widget and combobox with room information
+     * fills with rooms which has no clients */
+    connect(ui->dateBeginCalendar, SIGNAL(userDateChanged(QDate)),this, SLOT(fillRoomList()));
+    connect(ui->dateEndCalendar, SIGNAL(userDateChanged(QDate)), this, SLOT(fillRoomList()));
+    fillRoomList();
+
 
     ui->idField->setValidator(new QIntValidator(1, 9999, this));
     ui->passportField->setValidator(new QIntValidator(1, 99999999, this));
@@ -66,11 +69,13 @@ void RegisterClient::saveRegistration()
     query.addBindValue(ui->roomComboBox->currentText().toInt());
     query.exec();
 
-    /* updates room info according to client*/
-    query.prepare("UPDATE room SET checkin = ?, checkout = ? WHERE roomnumber = ?");
+
+   // Adds reservation to reservation table in database
+    query.prepare("INSERT INTO reservation (clientid, checkin, checkout)"
+                  "VALUES (?, ?, ?)");
+    query.addBindValue(ui->idField->text().toInt());
     query.addBindValue(ui->dateBeginCalendar->date());
     query.addBindValue(ui->dateEndCalendar->date());
-    query.addBindValue(ui->roomComboBox->currentText().toInt());
     query.exec();
 
     // Erases booked room from free rooms list
@@ -133,13 +138,36 @@ void RegisterClient::configureDatabase()
 // Fills free room Table and free room comboBox with room info
 void RegisterClient::fillRoomList()
 {
+    ui->roomComboBox->clear();
     QStringList headerLabels;
     headerLabels << "Kambario tipas" << "Kambario numeris" << "Tvarkingas";
     ui->roomTableWidget->setHorizontalHeaderLabels(headerLabels);
+    std::vector<Client*>::iterator clientIter, clientEnd;
+    std::vector<Reservation*>::iterator resIter, resEnd;
+
+    QList<int> notFreeRooms;
+    for (clientIter = clientList->begin(), clientEnd = clientList->end(); clientIter != clientEnd; ++clientIter) {
+        std::vector<Reservation*> resList = (*clientIter)->getResList();
+        for (resIter = resList.begin(), resEnd = resList.end(); resIter != resEnd; ++resIter) {
+            /* checks whether checkin and checkout dates are not reserved
+             * it also implies that on same day client checks out before another client comes in */
+            if (
+                (ui->dateBeginCalendar->date() >= (*resIter)->getCheckIn() && ui->dateBeginCalendar->date() < (*resIter)->getCheckOut())
+                ||
+                (ui->dateEndCalendar->date() > (*resIter)->getCheckIn() && ui->dateEndCalendar->date() <= (*resIter)->getCheckOut())
+                ||
+                (ui->dateBeginCalendar->date() < (*resIter)->getCheckIn() && ui->dateEndCalendar->date() > (*resIter)->getCheckOut())
+               )
+                notFreeRooms.push_back((*clientIter)->getRoomId());
+
+        }
+    }
+
     std::vector<Room*>::iterator iter, end;
+
     int index=0;
     for (iter = roomList->begin(), end = roomList->end(); iter != end; ++iter) {
-        if ((*iter)->getClientId()==0) {
+        if (!notFreeRooms.contains((*iter)->getRoomNumber())) {
             ui->roomTableWidget->setRowCount(index+1);
             ui->roomComboBox->addItem(QString::number((*iter)->getRoomNumber()));
             ui->roomTableWidget->setItem(index, 0, new QTableWidgetItem(QString::number((*iter)->getRoomNumber())));
@@ -151,4 +179,5 @@ void RegisterClient::fillRoomList()
             index++;
         }
     }
+
 }

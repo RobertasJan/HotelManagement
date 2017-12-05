@@ -2,31 +2,18 @@
 #define ROOM_H
 
 #include <QString>
-#include <QDate>
-#include "reservations.h"
 
 class Room
 {
 public:
-    Room(int, QString, bool, QDate, QDate, int);
+    Room(int, QString, bool);
     int getRoomNumber() const;
     QString getRoomType() const;
     bool getIsClean() const;
-    QDate getCheckIn() const;
-    QDate getCheckOut() const;
-    int getClientId() const;
-
-    void setCheckIn(QDate);
-    void setCheckOut(QDate);
-    void setClientId(int);
 private:
     int roomNumber;
     QString roomType;
     bool isClean;
-    QDate checkIn;
-    QDate checkOut;
-    int clientId;
-    Reservations *reservations;
 };
 
 #endif // ROOM_H
