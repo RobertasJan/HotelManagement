@@ -7,13 +7,14 @@
 #include <QDate> // checkIn and checkOut dates
 #include <QDebug>
 #include "person.h"
+#include "reservation.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     // setting size of mainWindow to x=1320, y=600
     setFixedSize(1320,600);
 
-    // creating main room table (rows=0, columns=6, parent)
+    // creating main room table (rows=0, columns=4, parent)
     roomTable = new QTableWidget(0,COLUMN_COUNT,this);
 
     // setting size and position;
@@ -33,15 +34,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     registerButton->move(690, 20);
     connect(registerButton, SIGNAL(released()), this, SLOT(callRegisterWindow()));
 
-    unregisterButton = new QPushButton("Išregistruoti klientą", this);
-    unregisterButton->setFixedSize(100, 30);
-    unregisterButton->move(690, 55);
-    connect(unregisterButton, SIGNAL(released()), this, SLOT(unregisterClient()));
-
     clientInfoButton = new QPushButton("Klientų informacija", this);
     clientInfoButton->setFixedSize(100, 30);
-    clientInfoButton->move(690, 110);
+    clientInfoButton->move(690, 70);
     connect(clientInfoButton, SIGNAL(released()), this, SLOT(callClientWindow()));
+
+    calendarButton = new QPushButton("Kalendorius", this);
+    calendarButton->setFixedSize(100, 30);
+    calendarButton->move(690, 105);
+    connect(calendarButton, SIGNAL(released()),  this, SLOT(callCalendarWindow()));
 
     refreshButton = new QPushButton("Atnaujinti", this);
     refreshButton->setFixedSize(100, 30);
@@ -72,7 +73,7 @@ void MainWindow::callRegisterWindow()
     groupBox->move(800,20);
     groupBox->show();
     // making registerClient children of groupBox, for memory control
-    registerClient = new RegisterClient(&roomList, this, groupBox);
+    registerClient = new RegisterClient(&roomList, &clientList, this, groupBox);
     registerClient->move(10,20);
     registerClient->show();
 }
@@ -91,13 +92,17 @@ void MainWindow::callClientWindow()
 
 }
 
-// TO BE DONE
-void MainWindow::unregisterClient()
+void MainWindow::callCalendarWindow()
 {
-    if (roomTable->selectionModel()->hasSelection())
-        qDebug () << roomTable->selectionModel()->selectedRows().first().row();
-    else
-        qDebug () << "None selected";
+    delete groupBox;
+    GroupBox *groupBox = new GroupBox(this);
+    groupBox->setTitle("Kambario kalendorius");
+    groupBox->move(800,20);
+    groupBox->show();
+
+    calendar = new Calendar(&roomList, &clientList, this, groupBox);
+    calendar->move(10,20);
+    calendar->show();
 }
 
 /* Function for clearing vectors of client and room
@@ -134,24 +139,22 @@ void MainWindow::fillRoomClass()
         int roomNumber = query.value(0).toInt();
         QString roomType = query.value(1).toString();
         bool isClean = query.value(2).toBool();
-        QDate checkIn = query.value(3).toDate();
-        QDate checkOut = query.value(4).toDate();
         // retrieving id of client who occupies this room
-        queryClient.prepare("SELECT id FROM client WHERE roomid = :roomNumber");
+        /*queryClient.prepare("SELECT id FROM client WHERE roomid = :roomNumber");
         queryClient.bindValue(":roomNumber", roomNumber);
         queryClient.exec();
         int clientId;
         if (queryClient.next())
             clientId = queryClient.value(0).toInt();
         else
-            clientId = 0;
-        roomList.push_back(new Room(roomNumber, roomType, isClean, checkIn, checkOut, clientId));
+            clientId = 0;*/
+        roomList.push_back(new Room(roomNumber, roomType, isClean));
     }
 }
 
 void MainWindow::fillClientClass()
 {
-    QSqlQuery query;
+    QSqlQuery query, queryRes;
     query.exec("SELECT * FROM client");
     while (query.next()) {
         int id = query.value(0).toInt();
@@ -161,7 +164,17 @@ void MainWindow::fillClientClass()
         QString info = query.value(4).toString();
         bool disturb = query.value(5).toBool();
         int roomId = query.value(6).toInt();
-        clientList.push_back(new Client(id, firstName, lastName, passport, info, disturb, roomId));
+        queryRes.prepare("SELECT * FROM reservation WHERE clientid = :idclient");
+        queryRes.bindValue(":idclient", id);
+        queryRes.exec();
+        std::vector<Reservation*> reservations;
+        while (queryRes.next()) {
+            int clientId = queryRes.value(0).toInt();
+            QDate checkIn = queryRes.value(1).toDate();
+            QDate checkOut = queryRes.value(2).toDate();
+            reservations.push_back(new Reservation(clientId, checkIn, checkOut));
+        }
+        clientList.push_back(new Client(id, firstName, lastName, passport, info, disturb, roomId, reservations));
     }
 
 }
@@ -174,15 +187,14 @@ void MainWindow::fillQTableWidget()
     /* setting header labels
      * roomNumber, roomType, isClean, checkIn, checkOut, clientId */
     QStringList headerLabels;
-    headerLabels << "Kambario numeris" << "Kambario tipas" << "Tvarkingas"
-                 << "Užsiregistravimas" << "Išsiregistravimas" << "Kliento ID";
+    headerLabels << "Kambario numeris" << "Kambario tipas" << "Tvarkingas" << "Užimtas dabar";
     roomTable->setHorizontalHeaderLabels(headerLabels);
 
     /* Filling table from vector roomList;
      * index - table row;
-     * 0 - roomNumber, 1 - roomType, 2 - isClean,
-     * 3 - checkIn date, 4 - checkOut date, 5 - clientId */
+     * 0 - roomNumber, 1 - roomType, 2 - isClean, 3 - isTaken Today*/
     std::vector<Room*>::iterator iter, end;
+    std::vector<Client*>::iterator clientIter, clientEnd;
     int index;
     for (iter = roomList.begin(), end = roomList.end(), index=0; iter != end; ++iter, ++index) {
         roomTable->setItem(index, 0, new QTableWidgetItem(QString::number((*iter)->getRoomNumber())));
@@ -191,8 +203,17 @@ void MainWindow::fillQTableWidget()
             roomTable->setItem(index, 2, new QTableWidgetItem("Ne"));
         else
             roomTable->setItem(index, 2, new QTableWidgetItem("Taip"));
-        roomTable->setItem(index, 3, new QTableWidgetItem((*iter)->getCheckIn().toString("yyyy-MM-dd")));
-        roomTable->setItem(index, 4, new QTableWidgetItem((*iter)->getCheckOut().toString("yyyy-MM-dd")));
-        roomTable->setItem(index, 5, new QTableWidgetItem(QString::number((*iter)->getClientId())));
+        roomTable->setItem(index, 3, new QTableWidgetItem("Ne"));
+        for (clientIter = clientList.begin(), clientEnd = clientList.end(); clientIter != clientEnd; ++clientIter) {
+            if ((*clientIter)->getRoomId() == (*iter)->getRoomNumber())
+            {
+                std::vector<Reservation*> resList = (*clientIter)->getResList();
+                std::vector<Reservation*>::iterator resIter, resEnd;
+                for (resIter = resList.begin(), resEnd = resList.end(); resIter != resEnd; ++resIter) {
+                if (QDate::currentDate() >= (*resIter)->getCheckIn() && QDate::currentDate() < (*resIter)->getCheckOut())
+                    roomTable->setItem(index, 3, new QTableWidgetItem("Taip"));
+                }
+            }
+        }
     }
 }

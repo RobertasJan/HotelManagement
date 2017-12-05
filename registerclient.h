@@ -18,20 +18,21 @@ class RegisterClient : public QWidget
     Q_OBJECT
 
 public:
-    explicit RegisterClient(std::vector<Room*> *roomList, MainWindow *mainWindow, QWidget *parent = 0);
+    explicit RegisterClient(std::vector<Room*> *roomList, std::vector<Client*> *clientList, MainWindow *mainWindow, QWidget *parent = 0);
     ~RegisterClient();
 private:
     Ui::RegisterClient *ui;
     bool checkDate();
     QSqlDatabase db;
     std::vector<Room*> *roomList;
+    std::vector<Client*> *clientList;
     MainWindow *mainWindow;
 
     void configureDatabase();
-    void fillRoomList();
 private slots:
     void saveRegistration();
     void clearInputs();
+    void fillRoomList();
 };
 
 #endif // REGISTERCLIENT_H
