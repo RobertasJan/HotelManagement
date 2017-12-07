@@ -12,6 +12,7 @@ Calendar::Calendar(std::vector<Room*> *roomList, std::vector<Client*> *clientLis
     this->mainWindow = mainWindow;
     this->clientList = clientList;
 
+
     ui->calendarTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->calendarTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // setting so items in table can be selected only one row
@@ -73,6 +74,9 @@ void Calendar::refreshTable()
     }
 }
 
+/* Unregisters client
+ * if client has more than 1 reservation
+ * client remains the same in SQL, else deletes */
 void Calendar::unregisterClient()
 {
     if (ui->calendarTable->selectionModel()->hasSelection()) {
@@ -86,6 +90,7 @@ void Calendar::unregisterClient()
         for (clientIter = clientList->begin(), clientEnd = clientList->end(); clientIter!=clientEnd; ++clientIter) {
             if ((*clientIter)->getId() == deleteId)
             {
+                //Deletes client if has only one reservation
                 if ((*clientIter)->getResList().size() == 1)
                 {
                     QDate begin = QDate::fromString(ui->calendarTable->item(index, 3)->text(), "yyyy-MM-dd");
@@ -101,8 +106,7 @@ void Calendar::unregisterClient()
                     query.exec();
 
                     mainWindow->connectRefreshTable();
-                }
-                else
+                } else // Deletes Reservation, but not client
                 {
                     QDate begin = QDate::fromString(ui->calendarTable->item(index, 3)->text(), "yyyy-MM-dd");
                     QDate end = QDate::fromString(ui->calendarTable->item(index, 4)->text(), "yyyy-MM-dd");

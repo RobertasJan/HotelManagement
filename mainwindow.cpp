@@ -49,6 +49,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     refreshButton->move(690, 550);
     connect(refreshButton, SIGNAL(released()), this, SLOT(connectRefreshTable()));
 
+    sendMaidButton = new QPushButton("Nusiųsti valytoją", this);
+    sendMaidButton->setFixedSize(100, 30);
+    sendMaidButton->move(690, 155);
+    connect(sendMaidButton, SIGNAL(released()), this, SLOT(sendMaid()));
+
+    uncleanButton = new QPushButton("Netvarkingas", this);
+    uncleanButton->setFixedSize(100, 30);
+    uncleanButton->move(690, 190);
+    connect(uncleanButton, SIGNAL(released()), this, SLOT(setUnclean()));
+
     //creating groupBox for future use
     groupBox = new GroupBox(this);
     groupBox->hide();
@@ -94,6 +104,7 @@ void MainWindow::callClientWindow()
 
 void MainWindow::callCalendarWindow()
 {
+
     delete groupBox;
     GroupBox *groupBox = new GroupBox(this);
     groupBox->setTitle("Kambario kalendorius");
@@ -103,6 +114,38 @@ void MainWindow::callCalendarWindow()
     calendar = new Calendar(&roomList, &clientList, this, groupBox);
     calendar->move(10,20);
     calendar->show();
+
+}
+
+void MainWindow::sendMaid()
+{
+    // Changles room clean value to true
+    if (roomTable->selectionModel()->hasSelection()) {
+        int index = roomTable->selectionModel()->selectedRows().first().row();
+        int cleanId = roomTable->item(index, 0)->text().toInt();
+        QSqlQuery query;
+        query.prepare("UPDATE room SET isclean = 1 WHERE roomnumber = ?");
+        query.addBindValue(cleanId);
+        query.exec();
+        connectRefreshTable();
+    } else {
+        QMessageBox::warning(this, "Klaida", "Nepasirinktas kambarys");
+    }
+}
+
+void MainWindow::setUnclean()
+{
+    if (roomTable->selectionModel()->hasSelection()) {
+        int index = roomTable->selectionModel()->selectedRows().first().row();
+        int cleanId = roomTable->item(index, 0)->text().toInt();
+        QSqlQuery query;
+        query.prepare("UPDATE room SET isclean = 0 WHERE roomnumber = ?");
+        query.addBindValue(cleanId);
+        query.exec();
+        connectRefreshTable();
+    } else {
+        QMessageBox::warning(this, "Klaida", "Nepasirinktas kambarys");
+    }
 }
 
 /* Function for clearing vectors of client and room
@@ -139,19 +182,12 @@ void MainWindow::fillRoomClass()
         int roomNumber = query.value(0).toInt();
         QString roomType = query.value(1).toString();
         bool isClean = query.value(2).toBool();
-        // retrieving id of client who occupies this room
-        /*queryClient.prepare("SELECT id FROM client WHERE roomid = :roomNumber");
-        queryClient.bindValue(":roomNumber", roomNumber);
-        queryClient.exec();
-        int clientId;
-        if (queryClient.next())
-            clientId = queryClient.value(0).toInt();
-        else
-            clientId = 0;*/
+
         roomList.push_back(new Room(roomNumber, roomType, isClean));
     }
 }
 
+//Fills client class with according reservations
 void MainWindow::fillClientClass()
 {
     QSqlQuery query, queryRes;
@@ -204,6 +240,8 @@ void MainWindow::fillQTableWidget()
         else
             roomTable->setItem(index, 2, new QTableWidgetItem("Taip"));
         roomTable->setItem(index, 3, new QTableWidgetItem("Ne"));
+
+        //Checks whether room is currently occupied
         for (clientIter = clientList.begin(), clientEnd = clientList.end(); clientIter != clientEnd; ++clientIter) {
             if ((*clientIter)->getRoomId() == (*iter)->getRoomNumber())
             {

@@ -10,6 +10,7 @@ ClientInfo::ClientInfo(std::vector<Client*> clientList, QWidget *parent) :
 
     ui->clientTable->setRowCount(clientList.size());
 
+    // Fills clientTable with hotel clients info
     std::vector<Client*>::iterator iter, end;
     int index=0;
     for (iter = clientList.begin(), end = clientList.end(); iter != end; ++iter) {
