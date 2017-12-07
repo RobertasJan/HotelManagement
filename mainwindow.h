@@ -32,6 +32,8 @@ private:
     QPushButton *clientInfoButton;
     QPushButton *calendarButton;
     QPushButton *refreshButton;
+    QPushButton *sendMaidButton;
+    QPushButton *uncleanButton;
 
     std::vector<Room*> roomList;
     std::vector<Client*> clientList;
@@ -49,6 +51,8 @@ private slots:
     void callRegisterWindow();
     void callClientWindow();
     void callCalendarWindow();
+    void sendMaid();
+    void setUnclean();
 };
 
 #endif // MAINWINDOW_H

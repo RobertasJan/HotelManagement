@@ -53,7 +53,20 @@ void RegisterClient::saveRegistration()
     if (ui->extraInfo->toPlainText().length() >= 160) {
         ui->warningInfo->setText("Per ilgas tekstas");
         return;
+    } else if (ui->idField->text().length() == 0) {
+        QMessageBox::warning(this, "Klaida", "Neįvestas ID");
+        return;
+    } else if (ui->firstNameField->text().length() == 0) {
+        QMessageBox::warning(this, "Klaida", "Neįvestas Vardas");
+        return;
+    } else if (ui->lastNameField->text().length() == 0) {
+        QMessageBox::warning(this, "Klaida", "Neįvesta Pavardė");
+        return;
+    } else if (ui->passportField->text().length() == 0) {
+        QMessageBox::warning(this, "Klaida", "Neįvestas paso kodas");
+        return;
     }
+
     ui->warningInfo->setText("");
 
     /* Inserts Client info into database */
@@ -163,6 +176,7 @@ void RegisterClient::fillRoomList()
         }
     }
 
+    //Fills table with free rooms list
     std::vector<Room*>::iterator iter, end;
 
     int index=0;

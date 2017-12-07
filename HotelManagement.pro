@@ -52,3 +52,6 @@ FORMS += \
     groupbox.ui \
     clientinfo.ui \
     calendar.ui
+
+DISTFILES += \
+    hotel.qmodel
