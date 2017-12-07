@@ -1,9 +1,11 @@
 # HotelManagement
-Hotel management system involving Mysql database.
+Hotel management system involving MySQL database.
 
-Project for college task.
+Project done for college task.
 Project is done in QT5.9.2 C++11.
 
-With this project I'm trying to learn how to version control my projects.
+With this project I'm trying to learn how to version control my projects. as well as further my knowledge in QT.
 
-A lot of classes are still empty, bare boned. Look into mainwindow.cpp for program logic.
+Look into mainwindow.cpp for program logic.
+
+Program images: https://imgur.com/a/YKmeG
